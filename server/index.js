@@ -7,6 +7,7 @@ const express = require('express');
 const path = require('path')
 const cors = require('cors')
 const cookSession = require('cookie-session')
+const { body, validationResult } = require('express-validator');
 
 // Importing our Login Service Used With the POST Login Route
 const loginService = require('./services/loginService')
@@ -27,7 +28,9 @@ const PORT =  process.env.PORT || 5000
 app.use(cors())
 
 //To get access to the name value pairs send in the message Body of POST Request.
+//urlencoded is POST data
  app.use(express.urlencoded({extended:true}))
+//tranfers json data between client and server
  app.use(express.json())
 
  // Session Middleware
@@ -44,7 +47,9 @@ app.use(cors())
 //Middleware Serving Static Pages from client directory
 // second parameter is an configuration object of how we want
 // the static file server to run.
- 
+//joining the server and client folders together
+//running static files to server
+//this is only for GET requests so POSTS will result in a 404 error
 app.use(express.static(path.join(__dirname, "../client"), {extensions: ["html", 'htm']})
 );
 
@@ -115,7 +120,12 @@ app.use(express.static(path.join(__dirname, "../client"), {extensions: ["html", 
  
  })
 
- 
+//SIGN UP PAGE
+
+app.post('/signup', (req, res)=>{
+  console.log(req.body)
+  res.redirect('login')
+})
 
 // Final Middleware 
 // Catch all for any request not handled while express was

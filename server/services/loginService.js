@@ -49,8 +49,8 @@ const formatErrors = function(user){
   let passwordWarning = ""
   let emailWarning = ""
 
-  if(user.validPassword === false){passwordWarning= `password doesn't seem to be correct`}
-  if(user.validEmail === false){ emailWarning= `email doesn't seem to be correct`}
+  if(user.validPassword === false){passwordWarning= `Incorrect password`}
+  if(user.validEmail === false){ emailWarning= `Incorrect email`}
 
   return {user:null, emailWarning, passwordWarning}
 }
