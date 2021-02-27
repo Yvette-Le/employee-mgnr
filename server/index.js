@@ -122,9 +122,22 @@ app.use(express.static(path.join(__dirname, "../client"), {extensions: ["html", 
 
 //SIGN UP PAGE
 
-app.post('/signup', (req, res)=>{
-  console.log(req.body)
-  res.redirect('login')
+app.post('/signup',
+
+body('name')
+.isLength({min:3})
+.withMessage('Must be min 3 characters'),
+body('password').isLength({min:5})
+.withMessage('Must be min 5 characters'),
+(req, res)=>{
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {``
+   const err = errors.array()
+   res.render('/signup',{
+     err
+   })
+  }
+
 })
 
 // Final Middleware 
