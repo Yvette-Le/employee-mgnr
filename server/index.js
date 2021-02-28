@@ -11,6 +11,8 @@ const { body, validationResult } = require('express-validator');
 
 // Importing our Login Service Used With the POST Login Route
 const loginService = require('./services/loginService')
+const fileService = require('./services/fileService')
+const { sign } = require('crypto');
 
 
 
@@ -20,47 +22,42 @@ const app = express()
 // read the value of PORT NODE_EVN variable in the .env file
 // when the index.js file starts up this file is read in and
 // we can set configuration variables for the application.
-// never upload to git...
 const PORT =  process.env.PORT || 5000 
 
  
-// Middleware For Cross Origin Resource SHaring
+//Middleware For Cross Origin Resource Sharing --> our API is public so any computer can use it
 app.use(cors())
 
-//To get access to the name value pairs send in the message Body of POST Request.
 //urlencoded is POST data
  app.use(express.urlencoded({extended:true}))
 //tranfers json data between client and server
  app.use(express.json())
 
- // Session Middleware
+ //Session Middleware
  app.use(cookSession({
    name:"session",
    keys:['SDFLU9iw2308dlsfuwe2adfl', 'LDFA34gsdfgFOPW2323DA7FS2']
  }))
 
- // Setup Template Engine
+ //Setup Template Engine
  app.set('view engine', 'ejs')
  app.set('views', path.join(__dirname, './views'))
  
 
 //Middleware Serving Static Pages from client directory
-// second parameter is an configuration object of how we want
-// the static file server to run.
-//joining the server and client folders together
-//running static files to server
+
+//joining the server and client folders together by running static files to server
+//{extensions:['html, "htm"]} ignores .html or .htm extensions
 //this is only for GET requests so POSTS will result in a 404 error
 app.use(express.static(path.join(__dirname, "../client"), {extensions: ["html", 'htm']})
 );
 
- 
- // Routing Middleware.  
- // login route.
- // Access Form Data uses the POST method from the req body.
- // Tell Express that you want to access POST Request body
- // Setup   app.use(express.urlencoded({extended:true}))
 
- // Basic Example of a Protected Route
+
+//<-- ROUTING LOGIN MIDDLEWARE -->
+
+ // dashboard is a protected route 
+ //if session is valid then go to dashboard, if invalid then redirect to login
  app.get('/dashboard', (req, res)=>{
           if(req.session.isValid){
             res.render('dashboard')
@@ -70,24 +67,22 @@ app.use(express.static(path.join(__dirname, "../client"), {extensions: ["html", 
  })
 
  app.get('/login', (req, res)=>{
-   // user template placed inside the views directory
-   // res.render(view, data)   ejs.render(template, {data})
+   // rendering template from views directory
    res.render('login', {passwordWarning:"", emailWarning:"", email:"", password:""})
 
  })
  app.post('/login', (req, res)=>{
-   // if your incomming name value pairs are alot then create an object
+   // object creating for name value pairs --> requesting content from body
     const credentials = {
       email:req.body.email,
       password:req.body.password
     }
-    // isValidUser returns {user:null, emailWarning, passwordWarning}
-    // isValudUser.user !=null...
+    // isValidUser uses loginService to see if data entered is valid
     const isValidUser =  loginService.authenticate(credentials)
    
-       //if the isValidUser has a user returned
+       //if isValidUser has a user returned
        if( isValidUser.user !== null){
-             // set a session value isValid
+             // setting a session value isValid
              if(!req.session.isValid){
                  req.session.isValid = true;
              }
@@ -95,7 +90,7 @@ app.use(express.static(path.join(__dirname, "../client"), {extensions: ["html", 
        }
 
        if(isValidUser.user === null){
-           // req.body.email, req.body.password
+         // if user does not exist then display errors
            res.render('login', {
              emailWarning:isValidUser.emailWarning, 
              passwordWarning:isValidUser.passwordWarning,
@@ -107,50 +102,73 @@ app.use(express.static(path.join(__dirname, "../client"), {extensions: ["html", 
     
  
  app.post('/login', (req, res)=>{
-   // POST name value pairs in body request
+// requesting form values from body
    const credentials = {
      email:req.body.email,
      password:req.body.password
     }
-    
-    
+  
     const isValidUser = loginService.authenticate(credentials)
    
     res.end()
- 
  })
 
-//SIGN UP PAGE
+//<-- ROUTING SIGN UP PAGE MIDDLEWARE -->
 
-app.post('/signup',
-
-body('name')
-.isLength({min:3})
-.withMessage('Must be min 3 characters'),
-body('password').isLength({min:5})
-.withMessage('Must be min 5 characters'),
-(req, res)=>{
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {``
-   const err = errors.array()
-   res.render('/signup',{
-     err
-   })
-  }
-
+//rendering the sign up page from views directory
+app.get('/signup', (req, res)=>{
+  res.render('signup')
 })
 
-// Final Middleware 
-// Catch all for any request not handled while express was
-// processing requests. 
-// Returns 404 Page from the client directory.
+app.post('/signup',
+// form validation --> checking for min length and valid email
+body('name')
+.isLength({min:3})
+.withMessage('Name must be at least 3 characters'),
+body('email')
+.isEmail()
+.withMessage('Enter a valid email'),
+body('password').isLength({min:5})
+.withMessage('Password must be at least 5 characters'),
+(req, res)=>{
+
+  //if there are errors, do not submit the form
+  const errors = validationResult(req)
+
+  //render error messages if sign up not OK --> will be displayed on client side
+  if (!errors.isEmpty()) {
+    const alert = errors.array()
+    res.render('signup', {
+      alert
+    })
+  }
+
+  //redirecting to login if sign up OK
+  res.redirect('login')
+
+  //requesting form content from body
+  const formContent = {
+    name: req.body.name ,
+    email:req.body.email,
+    password:req.body.password
+   }
+
+   //writing form data into users.json file
+   const newUser = fileService.writeFileContents('../data/users.json', formContent, null, 2)
+    newUser
+})
+
+
+
+// <-- FINAL MIDDLEWARE: 404 ERROR -->
+
+//catches any request not defined by the above middlewares and returns 404.html from client directory 
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "../client/404.html"));
 });
 
 
-
-// Tell express app to listen for incomming request on a specific PORT
+//telling express to listen for incoming requests on specific port
 app.listen(PORT, () => {
   console.log(`server started on http://localhost:5000`);
 });
