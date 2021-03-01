@@ -158,7 +158,9 @@ body('password').isLength({min:5})
     newUser
 })
 
-
+app.get('/users', function(req, res) {
+  res.render('users')
+});
 
 // <-- FINAL MIDDLEWARE: 404 ERROR -->
 

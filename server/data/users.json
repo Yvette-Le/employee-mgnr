@@ -1,1 +1,2 @@
-[{"name":"Bob Smith","email":"user@gmail.com","password":"123456"},{"name":"John Doe","email":"john@email.com","password":"abc123"}]
+[{"name":"Bob Smith","email":"user@gmail.com","password":"123456"},
+{"name":"John Doe","email":"john@email.com","password":"abc123"}]

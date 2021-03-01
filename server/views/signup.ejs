@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up Form</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspaces</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-  <nav class="navbar">
-    <ul>
-      <li><a href="index.html">home</a></li>
-      <li><a href="login">account login</a></li>
-    </ul>
-  </nav>
-
-  <aside class="app-form">
     <header>
-      <h2 class="center">Sign Up For Your Free Trial Account</h2>
+        <nav class="navbar">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="login">Account login</a></li>
+            </ul>
+        </nav>
     </header>
+<main class="container">
+
+
+      <h2>Sign Up For Your Free Trial Account</h2>
+
     <% if (typeof alert != 'undefined'){%>
       <% alert.forEach(function(error){ %>
       <div>
@@ -29,25 +34,26 @@
      <% }) %>
     <% } %>
             <form id="signup" action="/signup" method="POST">
-              <div class="form-control">
+              <div>
                 <label for="name">Full Name:</label>
                 <input id="name" type="text" name="name" placeholder="ex. John Doe">
               </div>
-              <div class="form-control">
+              <div>
                 <label for="email">Enter an valid email address:</label>
                 <input id="email" type="text" name="email" placeholder="ex. user@email.com">
               </div>
 
-              <div class="form-control">
+              <div>
                 <label for="password">Enter a password:</label>
                 <input id="password" type="text" name="password">
               </div>
 
-              <div class="form-control">
-                <button type="submit">create account</button>
+              <div>
+                <button type="submit">Create Account</button>
               </div>
             </form>
-  </aside>
+
+</main>
 </body>
 
 </html>
