@@ -1,5 +1,4 @@
-// require dotenv package to read the properties in the .env file.
-// never upload .env file to git.
+//require dotenv package to read the properties in the .env file
 require('dotenv').config()
 //import the express module
 const express = require('express');
@@ -9,12 +8,11 @@ const cors = require('cors')
 const cookSession = require('cookie-session')
 const { body, validationResult } = require('express-validator');
 
-// Importing our Login Service Used With the POST Login Route
+// Importing our login service Used With the POST login route
 const loginService = require('./services/loginService')
+
+// Importing our signup service Used With the POST signup route
 const fileService = require('./services/fileService')
-const { sign } = require('crypto');
-
-
 
 // create an instance of express
 const app = express()
@@ -44,7 +42,7 @@ app.use(cors())
  app.set('views', path.join(__dirname, './views'))
  
 
-//Middleware Serving Static Pages from client directory
+//Middleware: serving static Pages from client directory
 
 //joining the server and client folders together by running static files to server
 //{extensions:['html, "htm"]} ignores .html or .htm extensions
@@ -146,7 +144,7 @@ body('password').isLength({min:5})
   //redirecting to login if sign up OK
   res.redirect('login')
 
-  //requesting form content from body
+  //requesting form content from body by name
   const formContent = {
     name: req.body.name ,
     email:req.body.email,
